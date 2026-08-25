@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¡Elige tu Aventura!</title>
+    <style>
+        :root {
+            --primary: #2c4a3e;
+            --primary-light: #416d5d;
+            --accent: #d4a373;
+            --bg-color: #fcfbf9;
+            --card-bg: #ffffff;
+            --text-main: #2b2b2b;
+            --text-muted: #666666;
+            --border-radius: 16px;
+            --shadow: 0 10px 25px rgba(44, 74, 62, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 15px;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 420px;
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 680px;
+            position: relative;
+        }
+
+        .header {
+            background: var(--primary);
+            color: white;
+            padding: 22px 20px 25px 20px;
+            text-align: center;
+            border-bottom-left-radius: 24px;
+            border-bottom-right-radius: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Estilo para la foto circular */
+        .profile-pic {
+            width: 75px;
+            height: 75px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+
+        .header h1 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .header p {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            max-height: 560px;
+        }
+
+        .step {
+            display: none;
+            flex: 1;
+            flex-direction: column;
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+
+        .step.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            font-size: 1.15rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .card-option {
+            background: #ffffff;
+            border: 2px solid #eae5de;
+            border-radius: 12px;
+            padding: 14px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .card-option:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .card-option.selected {
+            border-color: var(--primary);
+            background-color: rgba(44, 74, 62, 0.03);
+        }
+
+        .card-option strong {
+            font-size: 0.95rem;
+            color: var(--primary);
+        }
+
+        .card-option span {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Tarjetas con foto para alojamiento */
+        .hotel-card {
+            background: #ffffff;
+            border: 2px solid #eae5de;
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            margin-bottom: 12px;
+        }
+
+        .hotel-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .hotel-card.selected {
+            border-color: var(--primary);
+            background-color: rgba(44, 74, 62, 0.03);
+        }
+
+        .hotel-card img {
+            width: 100%;
+            height: 110px;
+            object-fit: cover;
+        }
+
+        .hotel-info {
+            padding: 12px;
+        }
+
+        .hotel-info strong {
+            font-size: 0.95rem;
+            color: var(--primary);
+            display: block;
+            margin-bottom: 3px;
+        }
+
+        .hotel-info p {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            background: #fdfcfb;
+            border: 1px solid #eae5de;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        .checkbox-item input {
+            accent-color: var(--primary);
+            width: 16px;
+            height: 16px;
+        }
+
+        input[type="date"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #eae5de;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s;
+            margin-bottom: 15px;
+            background: #fff;
+            color: var(--text-main);
+        }
+
+        input[type="date"]:focus {
+            border-color: var(--primary);
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: auto;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background: var(--primary-light);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px solid #eae5de;
+            margin-top: 8px;
+        }
+
+        .btn-secondary:hover {
+            background: #f7f5f0;
+            color: var(--text-main);
+        }
+
+        .summary-card {
+            background: #f9f8f6;
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 15px;
+            border: 1px dashed var(--accent);
+        }
+
+        .summary-item {
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+        }
+
+        .summary-item span {
+            display: block;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .summary-item strong {
+            color: var(--primary);
+            font-size: 0.9rem;
+        }
+
+        .instructions {
+            background: rgba(212, 163, 115, 0.15);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            text-align: center;
+            color: #8c5825;
+            margin-bottom: 12px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="header">
+        <!-- CAMBIA 'nuestra-foto.jpg' POR EL NOMBRE DE TU ARCHIVO DE FOTO -->
+        <img src="nuestra-foto.jpg" alt="Foto de familia" class="profile-pic" onerror="this.style.display='none'">
+        <div>
+            <h1>¡Feliz 46 vueltas al sol!</h1>
+            <p>Tu regalo, tu decisión</p>
+        </div>
+    </div>
+
+    <div class="content">
+        
+        <!-- PASO 1: Elegir Destino -->
+        <div class="step active" id="step-1">
+            <h2>Elige tu gran experiencia</h2>
+            <div class="options-grid">
+                <div class="card-option" onclick="selectOption('destination', 'Europa', this)">
+                    <strong>✈️ Capital Europea Sorpresa</strong>
+                    <span>Estilo Waynabox: Vuelo + Hotel en una ciudad increíble por descubrir.</span>
+                </div>
+                <div class="card-option" onclick="selectOption('destination', 'Baztan', this)">
+                    <strong>🌲 Valle del Baztán</strong>
+                    <span>Magia, misterio y naturaleza siguiendo los pasos de la Trilogía del Baztán.</span>
+                </div>
+            </div>
+            <button class="btn" onclick="nextStep(2)">Continuar</button>
+        </div>
+
+        <!-- PASO 2: Compañía -->
+        <div class="step" id="step-2">
+            <h2>¿Cómo prefieres viajar?</h2>
+            <div class="options-grid">
+                <div class="card-option" onclick="selectOption('company', 'Pareja', this)">
+                    <strong>❤️ En Pareja</strong>
+                    <span>Una escapada romántica a solas tú y yo.</span>
+                </div>
+                <div class="card-option" onclick="selectOption('company', 'Familia', this)">
+                    <strong>👨‍👩‍👦 En Familia</strong>
+                    <span>¡Con nuestro hijo incluido para disfrutar los tres!</span>
+                </div>
+            </div>
+            <button class="btn" onclick="nextStep(3)">Continuar</button>
+            <button class="btn btn-secondary" onclick="prevStep(1)">Atrás</button>
+        </div>
+
+        <!-- PASO 3: Calendario / Fechas -->
+        <div class="step" id="step-3">
+            <h2>Selecciona una fecha concreta</h2>
+            <p style="font-size: 0.85rem; color: var(--text-muted); text-align: center; margin-bottom: 15px;">Elige el día de salida en el calendario:</p>
+            <input type="date" id="travel-date">
+            <button class="btn" onclick="handleDateStep()">Continuar</button>
+            <button class="btn btn-secondary" onclick="prevStep(2)">Atrás</button>
+        </div>
+
+        <!-- PASO 4A (Opcional Baztán): Puntos clásicos del libro -->
+        <div class="step" id="step-baztan-1">
+            <h2>Ruta Literaria Baztán</h2>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 10px; text-align: center;">Selecciona los rincones que no te quieres perder:</p>
+            <div class="checkbox-group">
+                <label class="checkbox-item"><input type="checkbox" name="baztan_spot" value="Elizondo y el puente de Arizkun"> Elizondo y puente de Arizkun</label>
+                <label class="checkbox-item"><input type="checkbox" name="baztan_spot" value="Señorío de Bertiz"> Parque Natural Señorío de Bertiz</label>
+                <label class="checkbox-item"><input type="checkbox" name="baztan_spot" value="Cuevas de Zugarramurdi"> Las misteriosas Cuevas de Zugarramurdi</label>
+                <label class="checkbox-item"><input type="checkbox" name="baztan_spot" value="Urdax y su monasterio"> Urdax y su histórico monasterio</label>
+            </div>
+            <button class="btn" onclick="nextStep('baztan-2')">Siguiente</button>
+            <button class="btn btn-secondary" onclick="prevStep(3)">Atrás</button>
+        </div>
+
+        <!-- PASO 4B (Opcional Baztán): Alojamiento con Fotos y Nombres -->
+        <div class="step" id="step-baztan-2">
+            <h2>Elige tu Alojamiento Ideal</h2>
+            <div class="options-grid">
+                
+                <div class="hotel-card" onclick="selectOption('accommodation', 'Hotel Baztán (Elizondo)', this)">
+                    <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=600&q=80" alt="Hotel Baztán">
+                    <div class="hotel-info">
+                        <strong>Hotel Baztán (Elizondo)</strong>
+                        <p>Clásico, cómodo y situado en el corazón de las investigaciones de Amaia Salazar.</p>
+                    </div>
+                </div>
+
+                <div class="hotel-card" onclick="selectOption('accommodation', 'Casa Rural Santamaría (Zugarramurdi)', this)">
+                    <img src="https://images.unsplash.com/photo-1510798831971-661eb04b3739?auto=format&fit=crop&w=600&q=80" alt="Casa Rural">
+                    <div class="hotel-info">
+                        <strong>Casa Rural Santamaría</strong>
+                        <p>Tradición de piedra y madera, rodeada de bosques mágicos y total tranquilidad.</p>
+                    </div>
+                </div>
+
+            </div>
+            <button class="btn" onclick="showSummary()">Ver Resumen</button>
+            <button class="btn btn-secondary" onclick="nextStep('baztan-1')">Atrás</button>
+        </div>
+
+        <!-- PASO FINAL: Resumen -->
+        <div class="step" id="step-summary">
+            <h2>¡Elección Guardada!</h2>
+            <div class="instructions">
+                📸 Haz un pantallazo a esta pantalla y envíamela por WhatsApp para organizarlo todo.
+            </div>
+            <div class="summary-card" id="summary-content">
+                <!-- Se rellena con JS -->
+            </div>
+            <button class="btn" onclick="resetApp()">Empezar de nuevo</button>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    let formData = {
+        destination: '',
+        company: '',
+        date: '',
+        spots: [],
+        accommodation: ''
+    };
+
+    function selectOption(field, value, element) {
+        const parent = element.parentElement;
+        parent.querySelectorAll('.card-option, .hotel-card').forEach(opt => opt.classList.remove('selected'));
+        element.classList.add('selected');
+        formData[field] = value;
+    }
+
+    function nextStep(stepId) {
+        document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+        if(typeof stepId === 'number') {
+            document.getElementById(`step-${stepId}`).classList.add('active');
+        } else {
+            document.getElementById(`step-${stepId}`).classList.add('active');
+        }
+    }
+
+    function prevStep(stepId) {
+        document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+        document.getElementById(`step-${stepId}`).classList.add('active');
+    }
+
+    function handleDateStep() {
+        const dateInput = document.getElementById('travel-date').value;
+        if (!dateInput) {
+            alert('Por favor, selecciona una fecha en el calendario.');
+            return;
+        }
+        formData.date = dateInput;
+
+        if (formData.destination === 'Baztan') {
+            nextStep('baztan-1');
+        } else {
+            showSummary();
+        }
+    }
+
+    function showSummary() {
+        if (formData.destination === 'Baztan') {
+            const checkboxes = document.querySelectorAll('input[name="baztan_spot"]:checked');
+            formData.spots = Array.from(checkboxes).map(cb => cb.value);
+        }
+
+        const container = document.getElementById('summary-content');
+        let html = `
+            <div class="summary-item">
+                <span>Destino Elegido</span>
+                <strong>${formData.destination === 'Europa' ? '✈️ Capital Europea' : '🌲 Valle del Baztán'}</strong>
+            </div>
+            <div class="summary-item">
+                <span>Compañía</span>
+                <strong>${formData.company === 'Pareja' ? '❤️ En Pareja' : '👨‍👩‍👦 En Familia'}</strong>
+            </div>
+            <div class="summary-item">
+                <span>Fecha Seleccionada</span>
+                <strong>${formData.date}</strong>
+            </div>
+        `;
+
+        if (formData.destination === 'Baztan') {
+            html += `
+                <div class="summary-item">
+                    <span>Lugares Clásicos</span>
+                    <strong>${formData.spots.length > 0 ? formData.spots.join(', ') : 'Ninguno especificado'}</strong>
+                </div>
+                <div class="summary-item">
+                    <span>Alojamiento Elegido</span>
+                    <strong>${formData.accommodation || 'No seleccionado'}</strong>
+                </div>
+            `;
+        }
+
+        container.innerHTML = html;
+        nextStep('summary');
+    }
+
+    function resetApp() {
+        formData = { destination: '', company: '', date: '', spots: [], accommodation: '' };
+        document.querySelectorAll('.card-option, .hotel-card').forEach(opt => opt.classList.remove('selected'));
+        document.getElementById('travel-date').value = '';
+        nextStep(1);
+    }
+</script>
+
+</body>
+</html>
